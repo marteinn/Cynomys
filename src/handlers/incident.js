@@ -1,4 +1,3 @@
-const AWS = require("aws-sdk");
 const { withOfflineSupport } = require("../decorators");
 const { scan } = require("../utils/dynamoDBHelpers");
 const { getSettings } = require("../settings");
@@ -23,6 +22,7 @@ const getIncidents = async (_event, _context) => {
             ...err,
         })
     }
+
 };
 
 module.exports = {
