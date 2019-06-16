@@ -16,7 +16,7 @@ test('that email is required', async () => {
 });
 
 test('that employee gets created', async () => {
-    const dyanmoDbHelpers = require("../dynamoDbHelpers");
+    const dyanmoDbHelpers = require("../dynamoDBHelpers");
     dyanmoDbHelpers.putDoc = jest.fn(
         _ => ({
             promise: _ => Promise.resolve(true),
@@ -46,7 +46,7 @@ test('that employee gets returned', async () => {
         lastName: "Doe",
     }
 
-    const dyanmoDbHelpers = require("../dynamoDbHelpers");
+    const dyanmoDbHelpers = require("../dynamoDBHelpers");
     dyanmoDbHelpers.scan = jest.fn(
         _ => ({
             promise: _ => Promise.resolve({
