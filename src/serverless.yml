@@ -1,16 +1,17 @@
-service: sitemonitoring
+service: cynomys
 
 provider:
   name: aws
   stage: dev
   runtime: nodejs8.10
   region: eu-west-1
-  memorySize: 512
+  memorySize: 256
   environment:
     TABLE_NAME: ${self:custom.tableName}
     WATCH_URLS: ${env:WATCH_URLS}
+    SLACK_REPORTING_WEBHOOK: ${env:SLACK_REPORTING_WEBHOOK}
   apiKeys:
-    - ${opt:stage}-SiteMonitoring
+    - ${opt:stage}-Cynomys
 
 plugins:
   - serverless-offline
@@ -40,6 +41,8 @@ functions:
   schedule:
     handler: handlers.schedule
     events:
+      - schedule:
+          rate: rate(5 minutes)
       - http:
           path: schedule
           method: get
@@ -57,6 +60,7 @@ functions:
       - http:
           path: incidents
           method: get
+          private: true
 
 resources:
   - ${file(resources/dynamodb-table.yml)}

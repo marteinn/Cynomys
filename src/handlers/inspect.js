@@ -34,7 +34,7 @@ const inspect = async (event, _context) => {
     let resp = {}
     let error;
     try {
-        resp = await fetch(url, { timeout: 6000 })
+        resp = await fetch(url, { timeout: 10*1000 })
     } catch (e) {
         error = e.message
     }

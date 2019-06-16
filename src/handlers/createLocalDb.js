@@ -2,7 +2,7 @@ const AWS = require("aws-sdk");
 const { withOfflineSupport, requireOffline } = require("../decorators.js");
 const { getSettings } = require("../settings.js");
 
-const createLocalDb = async (event, context) => {
+const createLocalDb = async (_event, _context) => {
     var dynamodb = new AWS.DynamoDB();
     var params = {
         TableName: getSettings().TABLE_NAME,
@@ -11,14 +11,9 @@ const createLocalDb = async (event, context) => {
                 AttributeName: "url",
                 KeyType: "HASH"
             },
-            //{
-                //AttributeName: "company",
-                //KeyType: "RANGE"
-            //}
         ],
         AttributeDefinitions: [
             { AttributeName: "url", AttributeType: "S" },
-            //{ AttributeName: "company", AttributeType: "S" }
         ],
         ProvisionedThroughput: {
             ReadCapacityUnits: 5,

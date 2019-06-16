@@ -1,18 +1,14 @@
 Resources:
-  EmployeeTable:
+  IncidentTable:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: ${self:custom.tableName}
       AttributeDefinitions:
-        - AttributeName: email
-          AttributeType: S
-        - AttributeName: company
+        - AttributeName: url
           AttributeType: S
       KeySchema:
-        - AttributeName: email
+        - AttributeName: url
           KeyType: HASH
-        - AttributeName: company
-          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: ${self:custom.tableThroughput}
         WriteCapacityUnits: ${self:custom.tableThroughput}
