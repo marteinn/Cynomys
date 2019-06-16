@@ -57,13 +57,19 @@ const inspect = async (event, _context) => {
 
     // Report new incident
     if (error && !hasReportedIncident) {
-        sendDownReportToSlack({
+        const slackMessage = {
             title: `${urlInfo.host} is down`,
             text: error,
-        });
+        }
 
         try {
-            createIncident(url);
+            await sendDownReportToSlack(slackMessage);
+        } catch (err) {
+            return buildErrorResponse(err);
+        }
+
+        try {
+            await createIncident(url);
         } catch (err) {
             return buildErrorResponse(err);
         }
@@ -73,7 +79,7 @@ const inspect = async (event, _context) => {
             body: JSON.stringify({
                 error: true,
                 message: error,
-                url,
+                slackMessage,
             })
         }
     }
@@ -84,14 +90,14 @@ const inspect = async (event, _context) => {
             new Date(incident.Item.created)
         )
 
-        sendUpReportToSlack({
+        await sendUpReportToSlack({
             title: `${urlInfo.host} is up`,
             text: `${url} is up again (down for ${totalDowntime})`,
             url: url,
         });
 
         try {
-            removeIncident(url);
+            await removeIncident(url);
         } catch (err) {
             return buildErrorResponse(err);
         }

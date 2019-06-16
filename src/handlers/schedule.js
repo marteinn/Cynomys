@@ -2,6 +2,7 @@ const R = require('ramda');
 const fetch = require('node-fetch');
 const { withOfflineSupport } = require("../decorators");
 const { getSettings } = require("../settings");
+const { buildErrorResponse } = require("../utils/errors");
 
 const schedule = async (_event, _context) => {
     const inspectEndpoint = getSettings().INSPECT_URL
@@ -9,25 +10,24 @@ const schedule = async (_event, _context) => {
     let watchUrls = getSettings().WATCH_URLS
     watchUrls = watchUrls.split(",")
 
-    R.map(inspectUrl(inspectEndpoint), watchUrls)
+    try {
+        const promises = R.map(inspectUrl(inspectEndpoint), watchUrls)
+        await Promise.all(promises)
+    } catch (e) {
+        return buildErrorResponse(err);
+    }
 
     return {
         statusCode: 200,
+        body: JSON.stringify({
+            inspectEndpoint: inspectEndpoint,
+            urls: watchUrls,
+        }),
     };
 }
 
-const getInspectEndpoint = (event) => {
-    const { Host: host } = event.headers;
-    let path = event.path.split("/")
-    path = [
-        ...path.slice(0, path.length-1),
-        "inspect"
-    ].join("/")
-    return `http://${host}${path}`
-}
-
 const inspectUrl = R.curry((endpoint, url) => {
-    fetch(`${endpoint}?${toQueryString({url})}`)
+    return fetch(`${endpoint}?${toQueryString({url})}`)
 })
 
 const toQueryString = R.pipe(
