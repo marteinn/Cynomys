@@ -1,6 +1,6 @@
-# Serverless-Node-Dynamodb-Boilerplate
+# Cynomys
 
-This is Node.js based serverless api boilerplate with built in dynamodb support
+A lightweight website monitor that runs on Serverless/AWS.
 
 
 ## Features
@@ -55,4 +55,4 @@ Want to contribute? Awesome. Just send a pull request.
 
 ## License
 
-Serverless-Node-Dynamodb-Boilerplate is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+Cynomys is released under the [MIT License](http://www.opensource.org/licenses/MIT).
