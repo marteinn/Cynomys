@@ -10,6 +10,7 @@ provider:
     TABLE_NAME: ${self:custom.tableName}
     WATCH_URLS: ${env:WATCH_URLS}
     SLACK_REPORTING_WEBHOOK: ${env:SLACK_REPORTING_WEBHOOK}
+    INSPECT_URL: ${env:INSPECT_URL}
   apiKeys:
     - ${opt:stage}-Cynomys
 
