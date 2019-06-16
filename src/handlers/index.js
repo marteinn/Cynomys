@@ -1,10 +1,13 @@
-const { createEmployee, getEmployee } = require('./employee');
+const { getIncidents } = require('./incident');
 const { createLocalDb } = require('./createLocalDb');
 const { getAppVersion } = require('./getAppVersion');
+const { schedule } = require('./schedule');
+const { inspect } = require('./inspect');
 
 module.exports = {
-    createEmployee,
-    getEmployee,
+    getIncidents,
     createLocalDb,
     getAppVersion,
+    schedule,
+    inspect,
 };

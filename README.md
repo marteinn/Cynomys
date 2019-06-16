@@ -24,12 +24,15 @@ This is Node.js based serverless api boilerplate with built in dynamodb support
 
 1. `npm install -g serverless`
 2. `make setup`
+3. `cp example.env .env`
 
 
 ## Developing locally
 
-1. `make local`
-2. `open http://localhost:3000`
+1. `docker-compose up -d`
+1. `cd src`
+1. `env $(cat .env | xargs) npm run start`
+1. `open http://localhost:3000`
 
 
 ## Handling secrets

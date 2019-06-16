@@ -1,4 +1,4 @@
-service: exampleapi
+service: sitemonitoring
 
 provider:
   name: aws
@@ -8,15 +8,16 @@ provider:
   memorySize: 512
   environment:
     TABLE_NAME: ${self:custom.tableName}
+    WATCH_URLS: ${env:WATCH_URLS}
   apiKeys:
-    - ${opt:stage}-ExampleApi
+    - ${opt:stage}-SiteMonitoring
 
 plugins:
   - serverless-offline
 
 custom:
   stage: ${opt:stage, self:provider.stage}
-  tableName: ${self:custom.stage}-Employee
+  tableName: ${self:custom.stage}-Incident
   tableThroughputs:
     prod: 1
     default: 1
@@ -36,19 +37,26 @@ functions:
           path: version
           method: get
           private: true
-  getEmployee:
-    handler: handlers.getEmployee
+  schedule:
+    handler: handlers.schedule
     events:
       - http:
-          path: employees
+          path: schedule
           method: get
-  createEmployee:
-    handler: handlers.createEmployee
+  inspect:
+    handler: handlers.inspect
+    timeout: 30
     events:
       - http:
-          path: employees
-          method: post
-          cors: true
+          path: inspect
+          method: get
+
+  incidents:
+    handler: handlers.getIncidents
+    events:
+      - http:
+          path: incidents
+          method: get
 
 resources:
   - ${file(resources/dynamodb-table.yml)}

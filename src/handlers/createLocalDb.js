@@ -8,17 +8,17 @@ const createLocalDb = async (event, context) => {
         TableName: getSettings().TABLE_NAME,
         KeySchema: [
             {
-                AttributeName: "email",
+                AttributeName: "url",
                 KeyType: "HASH"
             },
-            {
-                AttributeName: "company",
-                KeyType: "RANGE"
-            }
+            //{
+                //AttributeName: "company",
+                //KeyType: "RANGE"
+            //}
         ],
         AttributeDefinitions: [
-            { AttributeName: "email", AttributeType: "S" },
-            { AttributeName: "company", AttributeType: "S" }
+            { AttributeName: "url", AttributeType: "S" },
+            //{ AttributeName: "company", AttributeType: "S" }
         ],
         ProvisionedThroughput: {
             ReadCapacityUnits: 5,
@@ -31,10 +31,8 @@ const createLocalDb = async (event, context) => {
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: [
-                    "Created table. Table description JSON:",
-                    JSON.stringify(data, null, 2)
-                ]
+                message: "Created table. Table description JSON:",
+                data,
             })
         };
     } catch (err) {
