@@ -17,6 +17,7 @@ A lightweight website monitor that runs on Serverless/AWS.
 
 - Node 8.10.0
 - Serverless
+- [A slack app and webhook](https://api.slack.com/incoming-webhooks#create_a_webhook)
 
 
 ## Installation
