@@ -1,3 +1,5 @@
+![Cynomys](https://raw.githubusercontent.com/marteinn/Cynomys/develop/img/slack-example.png)
+
 # Cynomys
 
 A lightweight website monitor that runs on Serverless/AWS.
@@ -5,13 +7,10 @@ A lightweight website monitor that runs on Serverless/AWS.
 
 ## Features
 
-- [Serverless](https://serverless.com/)
-- Node.js
-- Dynamodb support
-- Offline support (using [serverless-offline](https://www.npmjs.com/package/serverless-offline) and docker)
-- Example endpoints
-- Circleci integration
-- Secret management
+- Supports multiple website endpoints
+- Interprets non 200/201 status codes as errors
+- Detects network/domain issues
+- Reports errors to slack through a webhook
 
 
 ## Requirements
