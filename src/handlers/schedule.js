@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const { withOfflineSupport } = require("../decorators");
 const { getSettings } = require("../settings");
 
-const schedule = async (event, context) => {
+const schedule = async (event, _context) => {
     const inspectEndpoint = getInspectEndpoint(event);
 
     let watchUrls = getSettings().WATCH_URLS

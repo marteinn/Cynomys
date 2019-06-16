@@ -1,6 +1,7 @@
 const URL = require('url');
 const R = require('ramda');
 const fetch = require('node-fetch');
+const distanceInWordsToNow = require('date-fns/distance_in_words_to_now')
 const { withOfflineSupport } = require("../decorators");
 const { getSettings } = require("../settings");
 const { statusCodes } = require("../utils/statusCodes");
@@ -8,7 +9,7 @@ const { putDoc, getDoc, deleteDoc } = require("../utils/dynamoDBHelpers");
 const { buildErrorResponse } = require("../utils/errors");
 
 
-const inspect = async (event, context) => {
+const inspect = async (event, _context) => {
     const { url } = event.queryStringParameters
     const urlInfo = URL.parse(url);
     let watchUrls = getSettings().WATCH_URLS
@@ -59,7 +60,6 @@ const inspect = async (event, context) => {
         sendDownReportToSlack({
             title: `${urlInfo.host} is down`,
             text: error,
-            url: url,
         });
 
         try {
@@ -80,9 +80,13 @@ const inspect = async (event, context) => {
 
     // Service back up, mark as up and remove incident
     if (!error && hasReportedIncident) {
+        const totalDowntime = distanceInWordsToNow(
+            new Date(incident.Item.created)
+        )
+
         sendUpReportToSlack({
             title: `${urlInfo.host} is up`,
-            text: `${url} is up again`,
+            text: `${url} is up again (down for ${totalDowntime})`,
             url: url,
         });
 
@@ -104,10 +108,12 @@ const inspect = async (event, context) => {
 }
 
 const createIncident = async (url) => {
-    const model = { url, created: new Date().getTime() };
     return await putDoc(
         { TableName: getSettings().TABLE_NAME },
-        { url, created: new Date().getTime() },
+        {
+            url,
+            created: new Date().getTime()
+        },
     ).promise();
 }
 
@@ -118,7 +124,7 @@ const removeIncident = async (url) => {
     ).promise();
 }
 
-const sendReportToSlack = R.curry(async (params, { title, text, url }) => {
+const sendReportToSlack = R.curry(async (params, { title, text }) => {
     const webhookUrl = getSettings().SLACK_REPORTING_WEBHOOK
     const body = {
         "attachments": [
@@ -131,7 +137,7 @@ const sendReportToSlack = R.curry(async (params, { title, text, url }) => {
         ]
     }
 
-    const resp = await fetch(webhookUrl, {
+    return await fetch(webhookUrl, {
         method: 'post',
         body: JSON.stringify(body),
         headers: { 'Content-Type': 'application/json' },
