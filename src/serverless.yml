@@ -41,6 +41,7 @@ functions:
           private: true
   schedule:
     handler: handlers.schedule
+    timeout: 60
     events:
       - schedule:
           rate: rate(5 minutes)
