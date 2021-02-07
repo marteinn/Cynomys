@@ -1,7 +1,7 @@
 const URL = require('url');
 const R = require('ramda');
 const fetch = require('node-fetch');
-const distanceInWordsToNow = require('date-fns/distance_in_words_to_now')
+const formatDistanceToNow = require('date-fns/formatDistanceToNow');
 const { withOfflineSupport } = require("../decorators");
 const { getSettings } = require("../settings");
 const { statusCodes } = require("../utils/statusCodes");
@@ -86,7 +86,7 @@ const inspect = async (event, _context) => {
 
     // Service back up, mark as up and remove incident
     if (!error && hasReportedIncident) {
-        const totalDowntime = distanceInWordsToNow(
+        const totalDowntime = formatDistanceToNow(
             new Date(incident.Item.created)
         )
 
