@@ -31,7 +31,8 @@ A lightweight website monitor that runs on Serverless/AWS.
 
 1. `docker-compose up -d`
 1. `cd src`
-1. `env $(cat .env | xargs) npm run start`
+1. `cp offline.example.env offline.env`
+1. `env $(cat offline.env | xargs) npm run start`
 1. `open http://localhost:3000/create-local-db`
 1. `open http://localhost:3000`
 

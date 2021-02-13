@@ -2,6 +2,7 @@
 npm-debug.log
 .serverless
 .env
+offline.env
 node_modules
 
 # Temporary folder
