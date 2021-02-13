@@ -18,7 +18,7 @@ const withOfflineSupport = handler => {
 
 const requireOffline = handler => {
     return async (event, ...params) => {
-        if (!event.isOffline) {
+        if (!process.env.IS_OFFLINE) {
             return { statusCode: 401 };
         }
 
