@@ -13,6 +13,18 @@ const inspect = async (event, _context) => {
     const { url } = event.queryStringParameters
     const urlInfo = URL.parse(url);
     let watchUrls = getSettings().WATCH_URLS
+
+    if (!watchUrls) {
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                error: true,
+                message: "WATCH_URLS is empty",
+                url,
+            })
+        }
+    }
+
     watchUrls = watchUrls.split(",")
 
     if (!watchUrls.includes(url)) {
@@ -26,11 +38,7 @@ const inspect = async (event, _context) => {
         }
     }
 
-    const incident = await getDoc(
-        { TableName: getSettings().TABLE_NAME }, { Key: { url } }
-    ).promise();
-    const hasReportedIncident = !R.isEmpty(incident);
-
+    // Check if url is available
     let resp = {}
     let error;
     try {
@@ -42,6 +50,11 @@ const inspect = async (event, _context) => {
     if (!error && resp.status !== 200 && resp.status !== 201) {
         error = `Status code ${resp.status}: ${statusCodes[resp.status]}`;
     }
+
+    const incident = await getDoc(
+        { TableName: getSettings().TABLE_NAME }, { Key: { url } }
+    ).promise();
+    const hasReportedIncident = !R.isEmpty(incident);
 
     // Incident is active and has already been reported
     if (error && hasReportedIncident) {
@@ -57,21 +70,28 @@ const inspect = async (event, _context) => {
 
     // Report new incident
     if (error && !hasReportedIncident) {
-        const slackMessage = {
-            title: `${urlInfo.host} is down`,
-            text: error,
-        }
-
-        try {
-            await sendDownReportToSlack(slackMessage);
-        } catch (err) {
-            return buildErrorResponse(err);
-        }
-
         try {
             await createIncident(url);
         } catch (err) {
             return buildErrorResponse(err);
+        }
+
+        if (getSettings().SLACK_REPORTING_WEBHOOK) {
+            const slackMessage = {
+                title: `${urlInfo.host} is down`,
+                text: error,
+            }
+
+            try {
+                await sendDownReportToSlack(slackMessage);
+            } catch (err) {
+                return buildErrorResponse(err);
+            }
+        }
+
+        if (getSettings().FOURTYSIXELKS_SMS_RECEIVER) {
+            const smsMessage = `${urlInfo.host} is down. ${error}`;
+            await sendDownReportToSMS({ text: smsMessage });
         }
 
         return {
@@ -90,16 +110,24 @@ const inspect = async (event, _context) => {
             new Date(incident.Item.created)
         )
 
-        await sendUpReportToSlack({
-            title: `${urlInfo.host} is up`,
-            text: `${url} is up again (down for ${totalDowntime})`,
-            url: url,
-        });
-
         try {
             await removeIncident(url);
         } catch (err) {
             return buildErrorResponse(err);
+        }
+
+        if (getSettings().SLACK_REPORTING_WEBHOOK) {
+            await sendUpReportToSlack({
+                title: `${urlInfo.host} is up`,
+                text: `${url} is up again (down for ${totalDowntime})`,
+                url: url,
+            });
+        }
+
+
+        if (getSettings().FOURTYSIXELKS_SMS_RECEIVER) {
+            const smsMessage = `${url} is up again (down for ${totalDowntime})`
+            await sendUpReportToSMS({ text: smsMessage });
         }
     }
 
@@ -152,6 +180,34 @@ const sendReportToSlack = R.curry(async (params, { title, text }) => {
 
 const sendUpReportToSlack = sendReportToSlack({ color: "00FF00" });
 const sendDownReportToSlack = sendReportToSlack({ color: "FF0000" });
+
+const sendReportToSMS = R.curry(async (params, { text }) => {
+    const username = getSettings().FOURTYSIXELKS_USERNAME;
+    const password = getSettings().FOURTYSIXELKS_PASSWORD;
+    const smsReceiver = getSettings().FOURTYSIXELKS_SMS_RECEIVER;
+    const body = new URLSearchParams({
+        ...params,
+        to: smsReceiver,
+        message: text,
+    });
+
+    const auth = 'Basic ' + Buffer.from(
+        username + ':' + password
+    ).toString('base64');
+
+    return await fetch("https://api.46elks.com/a1/sms", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+            "Authorization": auth,
+        },
+        body: body.toString(),
+    });
+});
+
+
+const sendUpReportToSMS = sendReportToSMS({ from: "Conymys" });
+const sendDownReportToSMS = sendReportToSMS({ from: "Conymys" });
 
 module.exports = {
     inspect: withOfflineSupport(inspect),
