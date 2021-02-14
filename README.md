@@ -19,7 +19,7 @@ A lightweight website monitor that runs on Serverless/AWS.
 - Node 12
 - Serverless >= 1.60.0
 - [A slack app and webhook](https://api.slack.com/incoming-webhooks#create_a_webhook)
-- [A 46els api user](https://46elks.com/docs/send-sms)
+- [A 46elks api user](https://46elks.com/docs/send-sms)
 
 
 ## Installation
