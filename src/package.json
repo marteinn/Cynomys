@@ -1,6 +1,6 @@
 {
-  "name": "src",
-  "version": "1.0.0",
+  "name": "Cynomys",
+  "version": "1.1.0",
   "main": "handlers/index.js",
   "scripts": {
     "test": "jest",
